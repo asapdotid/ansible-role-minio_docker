@@ -1,0 +1,52 @@
+---
+# tasks file for role-minio
+- name: STORAGE | Check MinIO directory
+  ansible.builtin.state:
+    path: "{{ minio_project_dir }}"
+  register: minio_dir
+
+- name: STORAGE | Create minio project directory
+  ansible.builtin.file:
+    path: "{{ minio_project_dir }}"
+    state: directory
+    mode: 0755
+    recurse: yes
+  when: not minio_dir.stat.exists
+
+- name: STORAGE | Get infos on container
+  community.docker.docker_container_info:
+    name: minio
+  register: minio_test
+
+- name: STORAGE | Does container exist?
+  ansible.builtin.debug:
+    msg: "The container {{ 'exists' if minio_test.exists else 'does not exist' }}"
+
+- name: STORAGE | Clone docker MinIO Docker
+  ansible.builtin.git:
+    repo: git@gitlab.com:asap-labs/docker-compose-minio.git
+    dest: "{{ minio_project_dir }}"
+    clone: yes
+    accept_hostkey: yes
+  when:
+    - not minio_test.exists
+    - not minio_dir.stat.exists
+
+- name: STORAGE | Configure environment docker
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ minio_project_dir }}/.env"
+  when: minio_dir.exists
+
+- name: STORAGE | Run `docker-compose up` MinIO
+  community.docker.docker_compose:
+    project_src: "{{ minio_project_dir }}"
+    build: yes
+  register: output
+  when:
+    - not minio_test.exists
+    - minio_dir.stat.exists
+
+- name: STORAGE | Debug docker
+  ansible.builtin.debug:
+    var: output
