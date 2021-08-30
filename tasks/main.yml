@@ -1,7 +1,6 @@
 ---
-# tasks file for role-minio
 - name: STORAGE | Check MinIO directory
-  ansible.builtin.state:
+  ansible.builtin.stat:
     path: "{{ minio_project_dir }}"
   register: minio_dir
 
@@ -36,7 +35,8 @@
   ansible.builtin.template:
     src: env.j2
     dest: "{{ minio_project_dir }}/.env"
-  when: minio_dir.exists
+    force: yes
+  when: minio_dir.stat.exists
 
 - name: STORAGE | Run `docker-compose up` MinIO
   community.docker.docker_compose:
