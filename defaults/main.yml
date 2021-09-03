@@ -4,6 +4,8 @@ minio_project_dir: "/home/minio"
 minio_docker_timezone: "Asia/Jakarta"
 minio_docker_user: "root"
 minio_docker_group: "root"
-minio_port: 9000
-minio_access_key: ""
-minio_secret_key: ""
+minio_port: 9001
+minio_version: "latest"
+minio_root_user: ""
+minio_root_password: ""
+minio_default_bucket: "bucket_1"
