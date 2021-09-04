@@ -1,42 +1,58 @@
 ---
-- name: STORAGE | Check MinIO directory
+- name: STORAGE | Check MinIO initial directory
   ansible.builtin.stat:
     path: "{{ minio_project_dir }}"
-  register: minio_dir
+  register: minio_init_dir
 
 - name: STORAGE | Create minio project directory
   ansible.builtin.file:
     path: "{{ minio_project_dir }}"
     state: directory
+    owner: root
+    group: root
     mode: 0755
     recurse: yes
-  when: not minio_dir.stat.exists
+  when: not minio_init_dir.stat.exists
+
+- name: STORAGE | Check MinIO directory
+  ansible.builtin.stat:
+    path: "{{ minio_project_dir }}"
+  register: minio_dir
+
+- name: STORAGE | Copy MinIO docker compose
+  ansible.builtin.template:
+    src: compose.j2
+    dest: "{{ minio_project_dir }}/docker-compose.yml"
+    owner: root
+    group: root
+    mode: "0644"
+    force: yes
+  when: minio_dir.stat.exists
+
+- name: STORAGE | Copy MinIO docker environment variables
+  ansible.builtin.template:
+    src: env.j2
+    dest: "{{ minio_project_dir }}/.env"
+    owner: root
+    group: root
+    mode: "0600"
+    force: yes
+  when: minio_dir.stat.exists
 
 - name: STORAGE | Get infos on container
   community.docker.docker_container_info:
     name: minio
-  register: minio_test
+  register: minio_container
 
-- name: STORAGE | Does container exist?
-  ansible.builtin.debug:
-    msg: "The container {{ 'exists' if minio_test.exists else 'does not exist' }}"
+- name: STORAGE | Check docker compose file
+  ansible.builtin.stat:
+    path: "{{ minio_project_dir }}/docker-compose.yml"
+  register: docker_compose
 
-- name: STORAGE | Clone docker MinIO Docker
-  ansible.builtin.git:
-    repo: git@gitlab.com:asap-labs/docker-compose-minio.git
-    dest: "{{ minio_project_dir }}"
-    clone: yes
-    accept_hostkey: yes
-  when:
-    - not minio_test.exists
-    - not minio_dir.stat.exists
-
-- name: STORAGE | Configure environment docker
-  ansible.builtin.template:
-    src: env.j2
-    dest: "{{ minio_project_dir }}/.env"
-    force: yes
-  when: minio_dir.stat.exists
+- name: STORAGE | Check environment file
+  ansible.builtin.stat:
+    path: "{{ minio_project_dir }}/.env"
+  register: env_file
 
 - name: STORAGE | Run `docker-compose up` MinIO
   community.docker.docker_compose:
@@ -44,8 +60,10 @@
     build: yes
   register: output
   when:
-    - not minio_test.exists
+    - not minio_container.exists
     - minio_dir.stat.exists
+    - env_file.stat.exists
+    - docker_compose.stat.exists
 
 - name: STORAGE | Debug docker
   ansible.builtin.debug:

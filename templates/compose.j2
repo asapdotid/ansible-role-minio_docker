@@ -1,0 +1,28 @@
+version: "3.2"
+
+networks:
+  app-tier:
+    driver: bridge
+
+services:
+  minio:
+    container_name: minio
+    image: minio/minio:${MINIO_VERSION}
+    user: ${DOCKER_USER}:${DOCKER_GROUP}
+    restart: unless-stopped
+    tty: true
+    ports:
+      - "${MINIO_PORT}:9000"
+    volumes:
+      - ./data/.minio:/root/.minio
+      - ./data:/data
+    entrypoint: sh
+    command: -c 'mkdir -p /data/${MINIO_DEFAULT_BUCKET} && /usr/bin/minio server --console-address ":${MINIO_PORT}" /data'
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    networks:
+      - app-tier
+    deploy:
+      restart_policy:
+        condition: on-failure

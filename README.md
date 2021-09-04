@@ -29,15 +29,17 @@ None
 
 ## Role Variables
 
-| Name                    | Default Value  | Description                  |
-| ----------------------- | -------------- | ---------------------------- |
-| `minio_project_dir`     | `/home/minio`  | Minio path project location. |
-| `minio_docker_timezone` | `Asia/Jakarta` | Setup Timezone.              |
-| `minio_docker_user`     | `root`         | Docker user.                 |
-| `minio_docker_group`    | `root`         | Docker user group.           |
-| `minio_port`            | `9000`         | MinIO port.                  |
-| `minio_access_key`      | ``             | MinIO access key.            |
-| `minio_secret_key`      | ``             | MinIO secret key.            |
+| Name                    | Default Value  | Description                                   |
+| ----------------------- | -------------- | --------------------------------------------- |
+| `minio_project_dir`     | `/home/minio`  | Minio path project location.                  |
+| `minio_docker_timezone` | `Asia/Jakarta` | Setup Timezone.                               |
+| `minio_docker_user`     | `root`         | Docker user.                                  |
+| `minio_docker_group`    | `root`         | Docker user group.                            |
+| `minio_port`            | `9005`         | MinIO port for client access.                 |
+| `minio_root_user`       | `""`           | MinIO root user.                              |
+| `minio_root_password`   | `""`           | MinIO root password.                          |
+| `minio_version`         | `""`           | MinIO docker image version, default `latest`. |
+| `minio_default_bucket`  | `""`           | MinIO default bucket.                         |
 
 ## Dependencies
 
