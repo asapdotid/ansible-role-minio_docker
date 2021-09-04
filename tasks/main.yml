@@ -1,8 +1,8 @@
 ---
-- name: STORAGE | Check MinIO directory
+- name: STORAGE | Check MinIO initial directory
   ansible.builtin.stat:
     path: "{{ minio_project_dir }}"
-  register: minio_dir
+  register: minio_init_dir
 
 - name: STORAGE | Create minio project directory
   ansible.builtin.file:
@@ -12,9 +12,14 @@
     group: root
     mode: 0755
     recurse: yes
-  when: not minio_dir.stat.exists
+  when: not minio_init_dir.stat.exists
 
-- name: STORAGE | Configure environment docker
+- name: STORAGE | Check MinIO directory
+  ansible.builtin.stat:
+    path: "{{ minio_project_dir }}"
+  register: minio_dir
+
+- name: STORAGE | Copy MinIO docker compose
   ansible.builtin.template:
     src: compose.j2
     dest: "{{ minio_project_dir }}/docker-compose.yml"
@@ -24,7 +29,7 @@
     force: yes
   when: minio_dir.stat.exists
 
-- name: STORAGE | Configure environment docker
+- name: STORAGE | Copy MinIO docker environment variables
   ansible.builtin.template:
     src: env.j2
     dest: "{{ minio_project_dir }}/.env"
