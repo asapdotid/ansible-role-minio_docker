@@ -7,7 +7,7 @@ networks:
 services:
   minio:
     container_name: minio
-    image: minio/minio:${MINIO_VERSION}
+    image: quay.io/minio/minio:${MINIO_VERSION}
     user: ${DOCKER_USER}:${DOCKER_GROUP}
     restart: unless-stopped
     tty: true
@@ -17,7 +17,7 @@ services:
       - ./data/.minio:/root/.minio
       - ./data:/data
     entrypoint: sh
-    command: -c 'mkdir -p /data/${MINIO_DEFAULT_BUCKET} && /usr/bin/minio server --console-address ":${MINIO_PORT}" /data'
+    command: -c 'mkdir -p /data/${MINIO_DEFAULT_BUCKET} && minio server /data --console-address ":${MINIO_PORT}"'
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
