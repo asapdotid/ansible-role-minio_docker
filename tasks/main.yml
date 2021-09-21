@@ -1,65 +1,88 @@
 ---
-- name: STORAGE | Check MinIO initial directory
-  ansible.builtin.stat:
-    path: "{{ minio_project_dir }}"
-  register: minio_init_dir
+- name: STORAGE | Initialized MINIO project directory.
+  block:
+    - name: STORAGE | Check MinIO initial directory
+      ansible.builtin.stat:
+        path: "{{ minio_project_dir }}"
+      register: minio_init_dir
 
-- name: STORAGE | Create minio project directory
-  ansible.builtin.file:
-    path: "{{ minio_project_dir }}"
-    state: directory
-    owner: root
-    group: root
-    mode: 0755
-    recurse: yes
-  when: not minio_init_dir.stat.exists
+    - name: STORAGE | Create minio project directory
+      ansible.builtin.file:
+        path: "{{ minio_project_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+        recurse: yes
+      when: not minio_init_dir.stat.exists
 
-- name: STORAGE | Configure environment docker
-  ansible.builtin.template:
-    src: compose.j2
-    dest: "{{ minio_project_dir }}/docker-compose.yml"
-    owner: root
-    group: root
-    mode: "0644"
-    force: yes
-  when: minio_dir.stat.exists
+  rescue:
+    - name: STORAGE | Initialized MINIO project errors
+      ansible.builtin.debug:
+        msg: "I caught an error, can do stuff here to fix it, :-)"
 
-- name: STORAGE | Copy MinIO docker environment variables
-  ansible.builtin.template:
-    src: env.j2
-    dest: "{{ minio_project_dir }}/.env"
-    owner: root
-    group: root
-    mode: "0600"
-    force: yes
-  when: minio_dir.stat.exists
+- name: STORAGE | Setup MINIO project.
+  block:
+    - name: STORAGE | Check MinIO initial directory
+      ansible.builtin.stat:
+        path: "{{ minio_project_dir }}"
+      register: minio_dir
 
-- name: STORAGE | Get infos on container
-  community.docker.docker_container_info:
-    name: minio
-  register: minio_container
+    - name: STORAGE | Copy MinIO docker compose variables
+      ansible.builtin.template:
+        src: compose.j2
+        dest: "{{ minio_project_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: "0644"
+        force: yes
+      when:
+        - minio_dir.stat.exists
+        - minio_dir.stat.isdir
 
-- name: STORAGE | Check docker compose file
-  ansible.builtin.stat:
-    path: "{{ minio_project_dir }}/docker-compose.yml"
-  register: docker_compose
+    - name: STORAGE | Copy MinIO docker environment variables
+      ansible.builtin.template:
+        src: env.j2
+        dest: "{{ minio_project_dir }}/.env"
+        owner: root
+        group: root
+        mode: "0600"
+        force: yes
+      when:
+        - minio_dir.stat.exists
+        - minio_dir.stat.isdir
 
-- name: STORAGE | Check environment file
-  ansible.builtin.stat:
-    path: "{{ minio_project_dir }}/.env"
-  register: env_file
+    - name: STORAGE | Get infos on container
+      community.docker.docker_container_info:
+        name: minio
+      register: minio_container
 
-- name: STORAGE | Run `docker-compose up` MinIO
-  community.docker.docker_compose:
-    project_src: "{{ minio_project_dir }}"
-    build: yes
-  register: output
-  when:
-    - not minio_container.exists
-    - minio_dir.stat.exists
-    - env_file.stat.exists
-    - docker_compose.stat.exists
+    - name: STORAGE | Check docker compose file
+      ansible.builtin.stat:
+        path: "{{ minio_project_dir }}/docker-compose.yml"
+      register: docker_compose
 
-- name: STORAGE | Debug docker
-  ansible.builtin.debug:
-    var: output
+    - name: STORAGE | Check environment file
+      ansible.builtin.stat:
+        path: "{{ minio_project_dir }}/.env"
+      register: env_file
+
+    - name: STORAGE | Run `docker-compose up` MinIO
+      community.docker.docker_compose:
+        project_src: "{{ minio_project_dir }}"
+        build: yes
+      register: output
+      when:
+        - not minio_container.exists
+        - minio_dir.stat.exists
+        - env_file.stat.exists
+        - docker_compose.stat.exists
+
+    - name: STORAGE | Debug docker
+      ansible.builtin.debug:
+        var: output
+
+  rescue:
+    - name: STORAGE | Setup MINIO project errors
+      ansible.builtin.debug:
+        msg: "I caught an error, can do stuff here to fix it, :-)"
