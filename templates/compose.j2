@@ -7,8 +7,8 @@ networks:
     driver: bridge
 
 services:
-  minio:
-    container_name: minio
+  {{ minio_docker_service_name }}:
+    container_name: {{ minio_docker_service_name }}
     image: quay.io/minio/minio:${MINIO_VERSION}
     user: ${DOCKER_USER}:${DOCKER_GROUP}
     restart: unless-stopped
