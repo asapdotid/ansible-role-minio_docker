@@ -36,6 +36,7 @@
         group: root
         mode: "0644"
         force: yes
+      register: copy_env
       when:
         - minio_dir.stat.exists
         - minio_dir.stat.isdir
@@ -48,39 +49,45 @@
         group: root
         mode: "0600"
         force: yes
+      register: copy_compose
       when:
         - minio_dir.stat.exists
         - minio_dir.stat.isdir
 
     - name: STORAGE | Get infos on container
       community.docker.docker_container_info:
-        name: minio
+        name: "{{ minio_docker_service_name }}"
       register: minio_container
 
     - name: STORAGE | Check docker compose file
       ansible.builtin.stat:
         path: "{{ minio_project_dir }}/docker-compose.yml"
-      register: docker_compose
+      register: compose_file
 
     - name: STORAGE | Check environment file
       ansible.builtin.stat:
         path: "{{ minio_project_dir }}/.env"
       register: env_file
 
+    - name: STORAGE | Stop `docker-compose down` MinIO
+      community.docker.docker_compose:
+        project_src: "{{ minio_project_dir }}"
+        state: absent
+        remove_orphans: yes
+      register: continer_stop
+      when:
+        - minio_container.exists
+        - (copy_env.changed or copy_compose.changed)
+
     - name: STORAGE | Run `docker-compose up` MinIO
       community.docker.docker_compose:
         project_src: "{{ minio_project_dir }}"
         build: yes
-      register: output
       when:
         - not minio_container.exists
-        - minio_dir.stat.exists
+        - minio_dir.stat.isdir
         - env_file.stat.exists
-        - docker_compose.stat.exists
-
-    - name: STORAGE | Debug docker
-      ansible.builtin.debug:
-        var: output
+        - compose_file.stat.exists
 
   rescue:
     - name: STORAGE | Setup MINIO project errors
