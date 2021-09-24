@@ -29,17 +29,18 @@ None
 
 ## Role Variables
 
-| Name                    | Default Value  | Description                                   |
-| ----------------------- | -------------- | --------------------------------------------- |
-| `minio_project_dir`     | `/home/minio`  | Minio path project location.                  |
-| `minio_docker_timezone` | `Asia/Jakarta` | Setup Timezone.                               |
-| `minio_docker_user`     | `root`         | Docker user.                                  |
-| `minio_docker_group`    | `root`         | Docker user group.                            |
-| `minio_port`            | `9005`         | MinIO port for client access.                 |
-| `minio_root_user`       | `""`           | MinIO root user.                              |
-| `minio_root_password`   | `""`           | MinIO root password.                          |
-| `minio_version`         | `""`           | MinIO docker image version, default `latest`. |
-| `minio_default_bucket`  | `""`           | MinIO default bucket.                         |
+| Name                        | Default Value  | Description                                   |
+| --------------------------- | -------------- | --------------------------------------------- |
+| `minio_docker_service_name` | `minio`        | Docker compose service name.                  |
+| `minio_project_dir`         | `/home/minio`  | Minio path project location.                  |
+| `minio_docker_timezone`     | `Asia/Jakarta` | Setup Timezone.                               |
+| `minio_docker_user`         | `root`         | Docker user.                                  |
+| `minio_docker_group`        | `root`         | Docker user group.                            |
+| `minio_port`                | `9005`         | MinIO port for client access.                 |
+| `minio_root_user`           | `""`           | MinIO root user.                              |
+| `minio_root_password`       | `""`           | MinIO root password.                          |
+| `minio_version`             | `""`           | MinIO docker image version, default `latest`. |
+| `minio_default_bucket`      | `""`           | MinIO default bucket.                         |
 
 ## Dependencies
 
@@ -50,6 +51,11 @@ None.
 Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
     - hosts: servers
+      vars:
+        minio_version: "RELEASE.2021-09-23T04-46-24Z"
+        minio_root_user: "min_admin"
+        minio_root_password: "ABCDabcd123456"
+
       roles:
          - { role: asapdotid.minio-docker }
 
