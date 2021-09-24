@@ -13,18 +13,18 @@ services:
     user: ${DOCKER_USER}:${DOCKER_GROUP}
     restart: unless-stopped
     tty: true
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     ports:
       - "${MINIO_PORT}:9000"
+    networks:
+      - app-tier
     volumes:
       - ./data/.minio:/root/.minio
       - ./data:/data
     entrypoint: sh
     command: -c 'mkdir -p /data/${MINIO_DEFAULT_BUCKET} && minio server /data --console-address ":${MINIO_PORT}"'
-    environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
-    networks:
-      - app-tier
     deploy:
       restart_policy:
         condition: on-failure
