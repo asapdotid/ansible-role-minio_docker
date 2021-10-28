@@ -3,10 +3,10 @@
 minio_docker_service_name: ""
 minio_project_dir: "/home/minio"
 minio_docker_timezone: "Asia/Jakarta"
-minio_docker_user: "root"
-minio_docker_group: "root"
+minio_docker_user: ""
+minio_docker_group: ""
 minio_port: 9001
 minio_version: "latest"
 minio_root_user: ""
 minio_root_password: ""
-minio_default_bucket: "bucket_1"
+minio_default_bucket: "bucket"

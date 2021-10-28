@@ -10,9 +10,7 @@
       ansible.builtin.file:
         path: "{{ minio_project_dir }}"
         state: directory
-        owner: root
-        group: root
-        mode: 0755
+        mode: "0755"
         recurse: yes
       when: not minio_init_dir.stat.exists
 
@@ -32,22 +30,8 @@
       ansible.builtin.template:
         src: compose.j2
         dest: "{{ minio_project_dir }}/docker-compose.yml"
-        owner: root
-        group: root
         mode: "0644"
-        force: yes
-      register: copy_env
-      when:
-        - minio_dir.stat.exists
-        - minio_dir.stat.isdir
-
-    - name: STORAGE | Copy MinIO docker environment variables
-      ansible.builtin.template:
-        src: env.j2
-        dest: "{{ minio_project_dir }}/.env"
-        owner: root
-        group: root
-        mode: "0600"
+        lstrip_blocks: yes
         force: yes
       register: copy_compose
       when:
@@ -64,26 +48,22 @@
         path: "{{ minio_project_dir }}/docker-compose.yml"
       register: compose_file
 
-    - name: STORAGE | Check environment file
-      ansible.builtin.stat:
-        path: "{{ minio_project_dir }}/.env"
-      register: env_file
-
     - name: STORAGE | Stop `docker-compose down` MinIO
       community.docker.docker_compose:
         project_src: "{{ minio_project_dir }}"
         state: absent
         remove_orphans: yes
+      become: yes
       register: continer_stop
       when:
         - minio_container.exists
-        - (copy_env.changed or copy_compose.changed)
+        - copy_compose.changed
 
     - name: STORAGE | Run `docker-compose up` MinIO
       community.docker.docker_compose:
         project_src: "{{ minio_project_dir }}"
         build: yes
-      when: (not minio_container.exists and minio_dir.stat.isdir and env_file.stat.exists and compose_file.stat.exists) or continer_stop.changed
+      when: (not minio_container.exists and minio_dir.stat.isdir and compose_file.stat.exists) or continer_stop.changed
 
   rescue:
     - name: STORAGE | Setup MINIO project errors
