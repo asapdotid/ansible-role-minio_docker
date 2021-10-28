@@ -34,13 +34,13 @@ None
 | `minio_docker_service_name` | `minio`        | Docker compose service name.                  |
 | `minio_project_dir`         | `/home/minio`  | Minio path project location.                  |
 | `minio_docker_timezone`     | `Asia/Jakarta` | Setup Timezone.                               |
-| `minio_docker_user`         | `root`         | Docker user.                                  |
-| `minio_docker_group`        | `root`         | Docker user group.                            |
+| `minio_docker_user`         | `""`           | Docker user.                                  |
+| `minio_docker_group`        | `""`           | Docker user group.                            |
 | `minio_port`                | `9005`         | MinIO port for client access.                 |
 | `minio_root_user`           | `""`           | MinIO root user.                              |
 | `minio_root_password`       | `""`           | MinIO root password.                          |
 | `minio_version`             | `""`           | MinIO docker image version, default `latest`. |
-| `minio_default_bucket`      | `""`           | MinIO default bucket.                         |
+| `minio_default_bucket`      | `"bucket"`     | MinIO default bucket.                         |
 
 ## Dependencies
 
