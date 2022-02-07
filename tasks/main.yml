@@ -3,12 +3,12 @@
   block:
     - name: STORAGE | Check MinIO initial directory
       ansible.builtin.stat:
-        path: "{{ minio_project_dir }}"
+        path: "{{ minio_docker_project_location }}"
       register: minio_init_dir
 
     - name: STORAGE | Create minio project directory
       ansible.builtin.file:
-        path: "{{ minio_project_dir }}"
+        path: "{{ minio_docker_project_location }}"
         state: directory
         mode: "0755"
         recurse: yes
@@ -23,13 +23,13 @@
   block:
     - name: STORAGE | Check MinIO initial directory
       ansible.builtin.stat:
-        path: "{{ minio_project_dir }}"
+        path: "{{ minio_docker_project_location }}"
       register: minio_dir
 
     - name: STORAGE | Copy MinIO docker compose variables
       ansible.builtin.template:
         src: compose.j2
-        dest: "{{ minio_project_dir }}/docker-compose.yml"
+        dest: "{{ minio_docker_project_location }}/docker-compose.yml"
         mode: "0644"
         lstrip_blocks: yes
         force: yes
@@ -45,12 +45,12 @@
 
     - name: STORAGE | Check docker compose file
       ansible.builtin.stat:
-        path: "{{ minio_project_dir }}/docker-compose.yml"
+        path: "{{ minio_docker_project_location }}/docker-compose.yml"
       register: compose_file
 
     - name: STORAGE | Stop `docker-compose down` MinIO
       community.docker.docker_compose:
-        project_src: "{{ minio_project_dir }}"
+        project_src: "{{ minio_docker_project_location }}"
         state: absent
         remove_orphans: yes
       become: yes
@@ -61,7 +61,7 @@
 
     - name: STORAGE | Run `docker-compose up` MinIO
       community.docker.docker_compose:
-        project_src: "{{ minio_project_dir }}"
+        project_src: "{{ minio_docker_project_location }}"
         build: yes
       when: (not minio_container.exists and minio_dir.stat.isdir and compose_file.stat.exists) or continer_stop.changed
 

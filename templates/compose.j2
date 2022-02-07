@@ -19,14 +19,20 @@ services:
       MINIO_ROOT_USER: {{ minio_root_user }}
       MINIO_ROOT_PASSWORD: {{ minio_root_password }}
     ports:
-      - {{ minio_port }}:9000
+      - {{ minio_server_port }}:{{ minio_server_port }}
+      - {{ minio_console_port }}:{{ minio_console_port }}
     networks:
       - app-tier
     volumes:
       - ./data/.minio:/root/.minio
       - ./data:/data:rw
     entrypoint: sh
-    command: -c 'mkdir -p /data/{{ minio_default_bucket }} && minio server /data --console-address ":{{ minio_port }}"'
+    command: -c 'mkdir -p /data/{{ minio_default_bucket }} && minio server --address ":{{ minio_server_port }}" --console-address ":{{ minio_console_port }}" /data'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:{{ minio_server_port }}/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
     deploy:
       restart_policy:
         condition: on-failure
