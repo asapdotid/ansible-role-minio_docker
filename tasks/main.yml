@@ -26,6 +26,16 @@
         path: "{{ minio_docker_project_location }}"
       register: minio_dir
 
+    - name: STORAGE | Create minio persistent data directory.
+      ansible.builtin.file:
+        path: "{{ minio_docker_project_location }}/data"
+        state: directory
+        mode: "0755"
+        recurse: yes
+      when:
+        - minio_dir.stat.exists
+        - minio_dir.stat.isdir
+
     - name: STORAGE | Copy MinIO docker compose variables
       ansible.builtin.template:
         src: compose.j2
@@ -42,6 +52,9 @@
       community.docker.docker_container_info:
         name: "{{ minio_docker_service_name }}"
       register: minio_container
+
+    - name: debug container
+      ansible.builtin.debug: var=minio_container.exists
 
     - name: STORAGE | Check docker compose file
       ansible.builtin.stat:
