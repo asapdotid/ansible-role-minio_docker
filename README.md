@@ -29,18 +29,19 @@ None
 
 ## Role Variables
 
-| Name                        | Default Value  | Description                                   |
-| --------------------------- | -------------- | --------------------------------------------- |
-| `minio_docker_service_name` | `minio`        | Docker compose service name.                  |
-| `minio_project_dir`         | `/home/minio`  | Minio path project location.                  |
-| `minio_docker_timezone`     | `Asia/Jakarta` | Setup Timezone.                               |
-| `minio_docker_user`         | `""`           | Docker user.                                  |
-| `minio_docker_group`        | `""`           | Docker user group.                            |
-| `minio_port`                | `9005`         | MinIO port for client access.                 |
-| `minio_root_user`           | `""`           | MinIO root user.                              |
-| `minio_root_password`       | `""`           | MinIO root password.                          |
-| `minio_version`             | `""`           | MinIO docker image version, default `latest`. |
-| `minio_default_bucket`      | `"bucket"`     | MinIO default bucket.                         |
+| Name                            | Default Value  | Description                    |
+| ------------------------------- | -------------- | ------------------------------ |
+| `minio_docker_version`          | `latest`       | Docker image version.          |
+| `minio_docker_service_name`     | `minio`        | Docker compose service name.   |
+| `minio_docker_network_name`     | `app-tier`     | Docker compose network name.   |
+| `minio_docker_project_location` | `/home/minio`  | Minio path project location.   |
+| `minio_docker_timezone`         | `Asia/Jakarta` | Setup Timezone.                |
+| `minio_docker_user`             | `""`           | Docker user.                   |
+| `minio_docker_group`            | `""`           | Docker user group.             |
+| `minio_docker_server_port`      | `9000`         | MinIO port for server access.  |
+| `minio_docker_console_port`     | `9001`         | MinIO port for console access. |
+| `minio_docker_root_user`        | `""`           | MinIO root user.               |
+| `minio_docker_root_password`    | `""`           | MinIO root password.           |
 
 ## Dependencies
 

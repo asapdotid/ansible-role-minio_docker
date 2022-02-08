@@ -1,12 +1,13 @@
 ---
 # defaults file for role-minio-docker
-minio_docker_service_name: ""
-minio_project_dir: "/home/minio"
+minio_docker_version: "latest"
+minio_docker_service_name: "minio"
+minio_docker_network_name: "app-tier"
+minio_docker_project_location: "/home/minio"
 minio_docker_timezone: "Asia/Jakarta"
 minio_docker_user: ""
 minio_docker_group: ""
-minio_port: 9001
-minio_version: "latest"
-minio_root_user: ""
-minio_root_password: ""
-minio_default_bucket: "bucket"
+minio_docker_server_port: 9000
+minio_docker_console_port: 9001
+minio_docker_root_user: ""
+minio_docker_root_password: ""

@@ -1,3 +1,2 @@
 ---
 # vars file for role-minio
-minio_docker_service_name: "minio"
