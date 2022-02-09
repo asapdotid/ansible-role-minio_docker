@@ -1,4 +1,9 @@
 ---
+- name: STORAGE | Import assert.yml
+  ansible.builtin.import_tasks: assert.yml
+  run_once: yes
+  delegate_to: localhost
+
 - name: STORAGE | Initialized MINIO project directory.
   block:
     - name: STORAGE | Check MinIO initial directory
@@ -77,6 +82,14 @@
         project_src: "{{ minio_docker_project_location }}"
         build: yes
       when: (not minio_container.exists and minio_dir.stat.isdir and compose_file.stat.exists) or continer_stop.changed
+
+    - name: Creates an entry like "@reboot docker compose minio"
+      ansible.builtin.cron:
+        name: "a job for reboot"
+        special_time: reboot
+        job: "/usr/local/bin/docker-compose -f /home/minio/docker-compose.yml up -d"
+      when:
+        - compose_file.stat.exists
 
   rescue:
     - name: STORAGE | Setup MINIO project errors

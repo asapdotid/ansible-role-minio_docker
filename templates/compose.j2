@@ -1,6 +1,6 @@
 # {{ ansible_managed }}
 
-version: "3.2"
+version: "3"
 
 networks:
     {{ minio_docker_network_name }}:
@@ -13,8 +13,6 @@ services:
     {% if (minio_docker_user|length) and (minio_docker_group|length) %}
     user: {{ minio_docker_user }}:{{ minio_docker_group }}
     {% endif %}
-    restart: unless-stopped
-    tty: true
     environment:
         TZ: {{ minio_docker_timezone }}
         MINIO_ROOT_USER: {{ minio_docker_root_user }}
@@ -27,13 +25,20 @@ services:
     volumes:
         - ./data/.minio:/root/.minio
         - ./data:/data:rw
-    entrypoint: sh
-    command: -c 'minio server --address ":{{ minio_docker_server_port }}" --console-address ":{{ minio_docker_console_port }}" /data'
+    entrypoint: ["/bin/sh","-c"]
+    command:
+        - |
+            mkdir -p /data/{{ minio_docker_default_bucket }}
+            minio server --address ":{{ minio_docker_server_port }}" --console-address ":{{ minio_docker_console_port }}" /data
     healthcheck:
         test: ["CMD", "curl", "-f", "http://localhost:{{ minio_docker_server_port }}/minio/health/live"]
         interval: 30s
         timeout: 20s
         retries: 3
+    restart: always
     deploy:
         restart_policy:
             condition: on-failure
+            delay: 5s
+            max_attempts: 3
+            window: 120s
