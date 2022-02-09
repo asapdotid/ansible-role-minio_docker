@@ -11,3 +11,4 @@ minio_docker_server_port: 9000
 minio_docker_console_port: 9001
 minio_docker_root_user: ""
 minio_docker_root_password: ""
+minio_docker_default_bucket: "bucket_1"
