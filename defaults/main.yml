@@ -3,6 +3,7 @@
 minio_docker_version: "latest"
 minio_docker_service_name: "minio"
 minio_docker_network_name: "app-tier"
+minio_docker_network_external: false
 minio_docker_project_location: "/home/minio"
 minio_docker_timezone: "Asia/Jakarta"
 minio_docker_user: ""

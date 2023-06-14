@@ -3,16 +3,17 @@
 version: "3"
 
 networks:
-    {{ minio_docker_network_name }}:
-        driver: bridge
+  {{ minio_docker_network_name }}:
+    driver: bridge
+    external: {{ minio_docker_network_external }}
 
 services:
   {{ minio_docker_service_name }}:
     container_name: {{ minio_docker_service_name }}
     image: quay.io/minio/minio:{{ minio_docker_version }}
-    {% if (minio_docker_user|length) and (minio_docker_group|length) %}
+{% if (minio_docker_user|length) and (minio_docker_group|length) %}
     user: {{ minio_docker_user }}:{{ minio_docker_group }}
-    {% endif %}
+{% endif %}
     environment:
         TZ: {{ minio_docker_timezone }}
         MINIO_ROOT_USER: {{ minio_docker_root_user }}
@@ -23,8 +24,7 @@ services:
     networks:
         - {{ minio_docker_network_name }}
     volumes:
-        - ./data/.minio:/root/.minio
-        - ./data:/data:rw
+        - {{ minio_docker_project_location }}/data:/data:rw
     entrypoint: ["/bin/sh","-c"]
     command:
         - |

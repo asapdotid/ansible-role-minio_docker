@@ -58,9 +58,6 @@
         name: "{{ minio_docker_service_name }}"
       register: minio_container
 
-    - name: debug container
-      ansible.builtin.debug: var=minio_container.exists
-
     - name: STORAGE | Check docker compose file
       ansible.builtin.stat:
         path: "{{ minio_docker_project_location }}/docker-compose.yml"
