@@ -42,10 +42,13 @@ None
 | `minio_docker_console_port`     | `9001`         | MinIO port for console access. |
 | `minio_docker_root_user`        | `""`           | MinIO root user.               |
 | `minio_docker_root_password`    | `""`           | MinIO root password.           |
+| `minio_docker_default_bucket`   | `bucket_1`     | MinIO default bucket.          |
 
 ## Dependencies
 
-None.
+Ansible collections:
+
+-   Community.Docker
 
 ## Example Playbook
 
@@ -53,12 +56,13 @@ Including an example of how to use your role (for instance, with variables passe
 
     - hosts: servers
       vars:
-        minio_version: "RELEASE.2021-09-23T04-46-24Z"
-        minio_root_user: "min_admin"
-        minio_root_password: "ABCDabcd123456"
+        minio_docker_version: "RELEASE.2023-07-11T21-29-34Z"
+        minio_docker_root_user: "minio_root"
+        minio_docker_root_password: "ABCDabcd123456"
+        minio_docker_default_bucket: "test_bucket"
 
       roles:
-         - { role: asapdotid.minio-docker }
+         - { role: asapdotid.minio_docker }
 
 ## License
 
