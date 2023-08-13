@@ -4,13 +4,13 @@
     that:
       - minio_docker_root_user is defined
       - minio_docker_root_user is string
-      - minio_docker_root_user|length > 0
-    quiet: yes
+      - minio_docker_root_user | length > 0
+    quiet: true
 
-- name: STORAGE |  Test if minio_docker_root_password is set correctly
+- name: STORAGE | Test if minio_docker_root_password is set correctly
   ansible.builtin.assert:
     that:
       - minio_docker_root_password is defined
       - minio_docker_root_password is string
-      - minio_docker_root_password|length > 0
-    quiet: yes
+      - minio_docker_root_password | length > 0
+    quiet: true
