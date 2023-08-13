@@ -1,7 +1,7 @@
 ---
 - name: STORAGE | Import assert.yml
   ansible.builtin.import_tasks: assert.yml
-  run_once: yes
+  run_once: true
   delegate_to: localhost
 
 - name: STORAGE | Initialized MINIO project directory.
@@ -16,7 +16,7 @@
         path: "{{ minio_docker_project_location }}"
         state: directory
         mode: "0755"
-        recurse: yes
+        recurse: true
       when: not minio_init_dir.stat.exists
 
   rescue:
@@ -36,7 +36,7 @@
         path: "{{ minio_docker_project_location }}/data"
         state: directory
         mode: "0755"
-        recurse: yes
+        recurse: true
       when:
         - minio_dir.stat.exists
         - minio_dir.stat.isdir
@@ -46,8 +46,8 @@
         src: compose.j2
         dest: "{{ minio_docker_project_location }}/docker-compose.yml"
         mode: "0644"
-        lstrip_blocks: yes
-        force: yes
+        lstrip_blocks: true
+        force: true
       register: copy_compose
       when:
         - minio_dir.stat.exists
@@ -67,8 +67,8 @@
       community.docker.docker_compose:
         project_src: "{{ minio_docker_project_location }}"
         state: absent
-        remove_orphans: yes
-      become: yes
+        remove_orphans: true
+      become: true
       register: continer_stop
       when:
         - minio_container.exists
@@ -77,7 +77,7 @@
     - name: STORAGE | Run `docker-compose up` MinIO
       community.docker.docker_compose:
         project_src: "{{ minio_docker_project_location }}"
-        build: yes
+        build: true
       when: (not minio_container.exists and minio_dir.stat.isdir and compose_file.stat.exists) or continer_stop.changed
 
     - name: Creates an entry like "@reboot docker compose minio"
